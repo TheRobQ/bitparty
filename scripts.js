@@ -15,16 +15,22 @@ const authedClient = new Gdax.AuthenticatedClient(
 //holds current BTC value, benchmark value
 const buySellData = {
   benchMarkPriceBTC: 0,
+  benchMarkPriceETH: 0,
   currentPriceBTC: 0,
+  currentPriceETH: 0,
   boughtPriceBTC: 0,
+  boughtPriceETH: 0,
   bought: false,
 }
 
 //kick it off
 const start = async () => {
-  let data = await authedClient.getProductTicker('ETH-USD')
+    let data = await authedClient.getProductTicker('BTC-USD');
+    let dataETH = await authedClient.getProductTicker('ETH-USD');
     buySellData.benchMarkPriceBTC =  data.ask;
-    buySellData.currentPriceBTC =  data.ask
+    buySellData.currentPriceBTC =  data.ask;
+    buySellData.benchMarkPriceETH =  dataETH.ask;
+    buySellData.currentPriceETH =  dataETH.ask
   }
 start()
 
@@ -34,12 +40,20 @@ const getAvailableBalance = async () => {
   return account[0].balance
 }
 
-const getAvailableCoins = async () => {
-    let coins = await authedClient.getAccount()
-    return coins[1].balance
+//Gets the amount of ether in the account
+const getAvailableETH = async () => {
+    let ether = await authedClient.getAccount();
+    return ether[1].balance
+}
+
+//Gets the amount of bitcoin in the account
+const getAvailableBTC = async () => {
+    let btc = await authedClient.getAccount();
+    return btc[2].balance
 }
 
 //Parameters to pass into the buy method
+//Needs to have product ID be a variable
 const params = {
   side: 'buy',
   type: 'limit',
@@ -50,6 +64,8 @@ const params = {
   product_id: 'ETH-USD',
 };
 
+//Params to pass into sell method
+//Needs to have product ID be a variable
 const sellParams = {
   price: 0,
   size: 0,
@@ -60,7 +76,7 @@ const sellParams = {
 
 //if price at start = 100, buycondition would be $95
 const checkBuyCondition  = (buySellData) => {
-  if(buySellData.currentPriceBTC <=buySellData.benchMarkPriceBTC * 0.98){
+  if(buySellData.currentPriceETH <=buySellData.benchMarkPriceETH * 0.98){
     return true
   } else {
     return false
@@ -68,7 +84,7 @@ const checkBuyCondition  = (buySellData) => {
 }
 
 const checkSellCondition = (buySellData) =>{
-    if(buySellData.currentPriceBTC >= buySellData.boughtPriceBTC *  1.02){
+    if(buySellData.currentPriceETH >= buySellData.boughtPriceETH *  1.02){
       return true;
     }else{
       return false;
@@ -84,8 +100,11 @@ const getBenchmark = async () => {
 //Sets the amount to buy as a percentage of available funds or $20
  const  calculateBuyAmount = async () =>{
   let totalFunds = await getAvailableBalance()
-  let buyAmount = totalFunds * .20
-  if(buyAmount > 30){
+  let buyAmount = totalFunds * .30
+  if(totalFunds < 30){
+    return false
+  }
+  else if(buyAmount > 30){
     let largerSize =  buyAmount / buySellData.currentPriceBTC
     params.size = largerSize.toFixed(4)
   }
@@ -97,7 +116,7 @@ const getBenchmark = async () => {
 
 //Sets the amount to sell
 const calculateSellAmount = async() =>{
-  let coin = await getAvailableCoins();
+  let coin = await getAvailableETH();
   sellParams.size = coin
 }
 
@@ -107,20 +126,20 @@ const current = async () => {
     //each ping to GDAX should resolve these to booleans
     let buy = checkBuyCondition(buySellData);
     let sell = checkSellCondition(buySellData);
-    calculateBuyAmount();
+    let enough = calculateBuyAmount();
     calculateSellAmount();
     buySellData.currentPriceBTC =  data.ask;
     params.price = data.ask;
     sellParams.price = data.ask;
-    if(buySellData.bought === false && buy === true){
+    if(buySellData.bought === false && buy === true && enough != false){
       authedClient.placeOrder(params);
-      buySellData.boughtPriceBTC = buySellData.currentPriceBTC;
+      buySellData.boughtPriceETH = buySellData.currentPriceETH;
       buySellData.bought = true;
       buy = false;
     }
-    if(buySellData.bought === true && sell === true && buySellData.boughtPriceBTC != 0){
+    if(buySellData.bought === true && sell === true && buySellData.boughtPriceETH != 0){
       authedClient.sell(sellParams);
-      buySellData.boughtPriceBTC = 0;
+      buySellData.boughtPriceETH= 0;
     }
     console.log(buySellData);
     console.log(params);
