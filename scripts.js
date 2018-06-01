@@ -129,19 +129,19 @@ const current = async () => {
     let sell = checkSellCondition(buySellData);
     let enoughFunds = calculateBuyAmount();
     calculateSellAmount();
-    this.currentPriceETH =  data.ask;
-    this.currentPriceBTC =  dataBTC.ask;
+    buySellData.currentPriceETH =  data.ask;
+    buySellData.currentPriceBTC =  dataBTC.ask;
     params.price = data.ask;
     sellParams.price = data.ask;
-    if(this.bought === false && buy === true && enoughFunds != false){
+    if(buySellData.bought === false && buy === true && enoughFunds != false){
       authedClient.placeOrder(params);
-      this.boughtPriceETH = this.currentPriceETH;
-      this.bought = true;
+      buySellData.boughtPriceETH = buySellData.currentPriceETH;
+      buySellData.bought = true;
       buy = false;
     }
-    if(this.bought === true && sell === true && this.boughtPriceETH != 0){
+    if(buySellData.bought === true && sell === true && buySellData.boughtPriceETH != 0){
       authedClient.sell(sellParams);
-      this.boughtPriceETH = 0;
+      buySellData.boughtPriceETH = 0;
     }
     console.log(buySellData);
     console.log(params);
@@ -149,11 +149,11 @@ const current = async () => {
     console.log(buy);
   }
 //start
-// start()
+start()
 //find a new benchmark every 4 hours
 setInterval(getBenchmark, 14400000);
 //check the price every minute
-setInterval(current, 30000);
+setInterval(current, 6000);
 
 module.exports = {
   getAvailableBalance,
