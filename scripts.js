@@ -32,7 +32,6 @@ const start = async () => {
     buySellData.benchMarkPriceETH =  dataETH.ask;
     buySellData.currentPriceETH =  dataETH.ask
   }
-start()
 
 //Get current balance in USD. Wil be invoked when we need to buy
 const getAvailableBalance = async () => {
@@ -76,7 +75,7 @@ const sellParams = {
 
 //if price at start = 100, buycondition would be $95
 const checkBuyCondition  = (buySellData) => {
-  if(buySellData.currentPriceETH <=buySellData.benchMarkPriceETH * 0.98){
+  if(buySellData.currentPriceETH <= buySellData.benchMarkPriceETH * 0.985){
     return true
   } else {
     return false
@@ -94,7 +93,7 @@ const checkSellCondition = (buySellData) =>{
 //Ask GDAX for the benchmark price, invoked in intervals below
 const getBenchmark = async () => {
   let data = await authedClient.getProductTicker('ETH-USD')
-  buySellData.benchMarkPriceBTC =  data.ask
+  buySellData.benchMarkPriceETH =  data.ask
 }
 
 //Sets the amount to buy as a percentage of available funds or $20
@@ -105,11 +104,11 @@ const getBenchmark = async () => {
     return false
   }
   else if(buyAmount > 30){
-    let largerSize =  buyAmount / buySellData.currentPriceBTC
+    let largerSize =  buyAmount / buySellData.currentPriceETH
     params.size = largerSize.toFixed(4)
   }
   else{
-   let size = 30 / buySellData.currentPriceBTC;
+   let size = 30 / buySellData.currentPriceETH;
    params.size = size.toFixed(4)
   }
 }
@@ -123,35 +122,37 @@ const calculateSellAmount = async() =>{
 //Ask GDAX for the current  price, invoked in intervals below
 const current = async () => {
     let data = await authedClient.getProductTicker('ETH-USD');
+    let dataBTC = await authedClient.getProductTicker('BTC-USD');
     //each ping to GDAX should resolve these to booleans
     let buy = checkBuyCondition(buySellData);
     let sell = checkSellCondition(buySellData);
-    let enough = calculateBuyAmount();
+    let enoughFunds = calculateBuyAmount();
     calculateSellAmount();
-    buySellData.currentPriceBTC =  data.ask;
+    this.currentPriceETH =  data.ask;
+    this.currentPriceBTC =  dataBTC.ask;
     params.price = data.ask;
     sellParams.price = data.ask;
-    if(buySellData.bought === false && buy === true && enough != false){
+    if(this.bought === false && buy === true && enoughFunds != false){
       authedClient.placeOrder(params);
-      buySellData.boughtPriceETH = buySellData.currentPriceETH;
-      buySellData.bought = true;
+      this.boughtPriceETH = this.currentPriceETH;
+      this.bought = true;
       buy = false;
     }
-    if(buySellData.bought === true && sell === true && buySellData.boughtPriceETH != 0){
+    if(this.bought === true && sell === true && this.boughtPriceETH != 0){
       authedClient.sell(sellParams);
-      buySellData.boughtPriceETH= 0;
+      this.boughtPriceETH = 0;
     }
     console.log(buySellData);
     console.log(params);
     console.log(sellParams);
     console.log(buy);
-    console.log(sell);
   }
-
-//find a new benchmark every 3 hours
-setInterval(getBenchmark, 10800000);
+//start
+start()
+//find a new benchmark every 4 hours
+setInterval(getBenchmark, 14400000);
 //check the price every minute
-setInterval(current, 6000);
+setInterval(current, 45000);
 
 module.exports = {
   getAvailableBalance,
