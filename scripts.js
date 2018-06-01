@@ -73,7 +73,7 @@ const sellParams = {
 }
 // authedClient.buy(buyParams);
 
-//if price at start = 100, buycondition would be $95
+//if price at start = 100, buycondition would be $98.50
 const checkBuyCondition  = (buySellData) => {
   if(buySellData.currentPriceETH <= buySellData.benchMarkPriceETH * 0.985){
     return true
@@ -82,6 +82,7 @@ const checkBuyCondition  = (buySellData) => {
    }
 }
 
+//If bought at 98.50 sell at 100.47
 const checkSellCondition = (buySellData) =>{
     if(buySellData.currentPriceETH >= buySellData.boughtPriceETH *  1.02){
       return true;
@@ -148,11 +149,11 @@ const current = async () => {
     console.log(buy);
   }
 //start
-start()
+// start()
 //find a new benchmark every 4 hours
 setInterval(getBenchmark, 14400000);
 //check the price every minute
-setInterval(current, 45000);
+setInterval(current, 30000);
 
 module.exports = {
   getAvailableBalance,
