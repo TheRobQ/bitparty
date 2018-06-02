@@ -14,23 +14,18 @@ const authedClient = new Gdax.AuthenticatedClient(
 );
 //holds current BTC value, benchmark value
 const buySellData = {
-  benchMarkPriceBTC: 0,
   benchMarkPriceETH: 0,
-  currentPriceBTC: 0,
   currentPriceETH: 0,
-  boughtPriceBTC: 0,
   boughtPriceETH: 0,
   bought: false,
 }
 
 //kick it off
 const start = async () => {
-    let data = await authedClient.getProductTicker('BTC-USD');
     let dataETH = await authedClient.getProductTicker('ETH-USD');
-    buySellData.benchMarkPriceBTC =  data.ask;
-    buySellData.currentPriceBTC =  data.ask;
     buySellData.benchMarkPriceETH =  dataETH.ask;
-    buySellData.currentPriceETH =  dataETH.ask
+    buySellData.currentPriceETH =  dataETH.ask;
+    console.log(buySellData);
   }
 
 //Get current balance in USD. Wil be invoked when we need to buy
@@ -74,7 +69,7 @@ const sellParams = {
 
 //if price at start = 100, buycondition would be $98.50
 const checkBuyCondition  = (buySellData) => {
-  if(buySellData.currentPriceETH <= buySellData.benchMarkPriceETH * 0.985){
+  if(buySellData.currentPriceETH <= buySellData.benchMarkPriceETH * 0.99){
     return true
   } else {
     return false
@@ -119,23 +114,30 @@ const calculateSellAmount = async() =>{
   sellParams.size = coin
 }
 
+const response = (error, resoponse, data) => {
+  if(error){
+    console.log(error);
+  }
+  else{
+    console.log(data.price);
+  }
+}
+
 //Ask GDAX for the current  price, invoked in intervals below
 const current = async () => {
     let data = await authedClient.getProductTicker('ETH-USD');
-    let dataBTC = await authedClient.getProductTicker('BTC-USD');
     //each ping to GDAX should resolve these to booleans
     let buy = checkBuyCondition(buySellData);
     let sell = checkSellCondition(buySellData);
     let enoughFunds = calculateBuyAmount();
     calculateSellAmount();
     buySellData.currentPriceETH =  data.ask;
-    buySellData.currentPriceBTC =  dataBTC.ask;
     params.price = data.ask;
     sellParams.price = data.ask;
     if(buySellData.bought === false && buy === true && enoughFunds != false){
-        authedClient.placeOrder(params);
         buySellData.boughtPriceETH = buySellData.currentPriceETH;
         buySellData.bought = true;
+        authedClient.placeOrder(params, response);
         buy = false;
     }
     if(buySellData.bought === true && sell === true && buySellData.boughtPriceETH != 0){
