@@ -68,10 +68,9 @@ const params = {
 const sellParams = {
   price: 0,
   size: 0,
- product_id: 'ETH-USD',
- post_only: true,
+  product_id: 'ETH-USD',
+  post_only: true,
 }
-// authedClient.buy(buyParams);
 
 //if price at start = 100, buycondition would be $98.50
 const checkBuyCondition  = (buySellData) => {
@@ -84,7 +83,7 @@ const checkBuyCondition  = (buySellData) => {
 
 //If bought at 98.50 sell at 100.47
 const checkSellCondition = (buySellData) =>{
-    if(buySellData.currentPriceETH >= buySellData.boughtPriceETH *  1.02){
+    if(buySellData.currentPriceETH >= buySellData.boughtPriceETH *  1.03){
       return true;
     }else{
       return false;
@@ -134,19 +133,21 @@ const current = async () => {
     params.price = data.ask;
     sellParams.price = data.ask;
     if(buySellData.bought === false && buy === true && enoughFunds != false){
-      authedClient.placeOrder(params);
-      buySellData.boughtPriceETH = buySellData.currentPriceETH;
-      buySellData.bought = true;
-      buy = false;
+        authedClient.placeOrder(params);
+        buySellData.boughtPriceETH = buySellData.currentPriceETH;
+        buySellData.bought = true;
+        buy = false;
     }
     if(buySellData.bought === true && sell === true && buySellData.boughtPriceETH != 0){
-      authedClient.sell(sellParams);
-      buySellData.boughtPriceETH = 0;
+        authedClient.sell(sellParams);
+        buySellData.boughtPriceETH = 0;
+        buySellData.bought = false;
     }
     console.log(buySellData);
     console.log(params);
     console.log(sellParams);
     console.log(buy);
+    console.log(sell);
   }
 //start
 start()
