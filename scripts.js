@@ -17,8 +17,8 @@ const buySellData = {
   benchMarkPriceETH: 0,
   currentPriceETH: 0,
   boughtPriceETH: 0,
-  bought: false,
-}
+};
+let bought = false;
 
 //kick it off
 const start = async () => {
@@ -69,7 +69,7 @@ const sellParams = {
 
 //if price at start = 100, buycondition would be $98.50
 const checkBuyCondition  = (buySellData) => {
-  if(buySellData.currentPriceETH <= buySellData.benchMarkPriceETH * 0.99){
+  if(buySellData.currentPriceETH < buySellData.benchMarkPriceETH * 0.985){
     return true
   } else {
     return false
@@ -94,7 +94,7 @@ const getBenchmark = async () => {
 //Sets the amount to buy as a percentage of available funds or $20
  const  calculateBuyAmount = async () =>{
   let totalFunds = await getAvailableBalance()
-  let buyAmount = totalFunds * .30
+  let buyAmount = totalFunds * 0.30
   if(totalFunds < 30){
     return false
   }
@@ -114,12 +114,25 @@ const calculateSellAmount = async() =>{
   sellParams.size = coin
 }
 
-const response = (error, resoponse, data) => {
+const setAsBought = (error, resoponse, data) => {
   if(error){
-    console.log(error);
+    console.log(error.body);
   }
   else{
-    console.log(data.price);
+    console.log(data.price)
+    buySellData.boughtPriceETH = data.price;
+    bought = true
+  }
+}
+
+const setAsSold = (error, resoponse, data) => {
+  if(error){
+    console.log(error.body);
+  }
+  else{
+    console.log(data.price)
+    buySellData.boughtPriceETH = 0;
+    bought = false;
   }
 }
 
@@ -129,18 +142,16 @@ const current = async () => {
     //each ping to GDAX should resolve these to booleans
     let buy = checkBuyCondition(buySellData);
     let sell = checkSellCondition(buySellData);
-    let enoughFunds = calculateBuyAmount();
+    let enoughFunds = await calculateBuyAmount();
     calculateSellAmount();
     buySellData.currentPriceETH =  data.ask;
     params.price = data.ask;
     sellParams.price = data.ask;
-    if(buySellData.bought === false && buy === true && enoughFunds != false){
-        buySellData.boughtPriceETH = buySellData.currentPriceETH;
-        buySellData.bought = true;
-        authedClient.placeOrder(params, response);
-        buy = false;
+    // If buy condiutionsa re met, execute a trade. Only ONE trade should be executed at a time
+    if(buy === true && bought != true && enoughFunds != false){
+        authedClient.placeOrder(params, setAsBought)
     }
-    if(buySellData.bought === true && sell === true && buySellData.boughtPriceETH != 0){
+    if(bought === true && buySellData.boughtPriceETH != 0 && sell === true ){
         authedClient.sell(sellParams);
         buySellData.boughtPriceETH = 0;
         buySellData.bought = false;
@@ -148,6 +159,7 @@ const current = async () => {
     console.log(buySellData);
     console.log(params);
     console.log(sellParams);
+    console.log(bought);
     console.log(buy);
     console.log(sell);
   }
@@ -156,7 +168,7 @@ start()
 //find a new benchmark every 4 hours
 setInterval(getBenchmark, 14400000);
 //check the price every minute
-setInterval(current, 30000);
+setInterval(current, 15000);
 
 module.exports = {
   getAvailableBalance,
