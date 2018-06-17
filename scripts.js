@@ -94,7 +94,7 @@ const getBenchmark = async () => {
 //Sets the amount to buy as a percentage of available funds or $20
  const  calculateBuyAmount = async () =>{
   let totalFunds = await getAvailableBalance()
-  let buyAmount = totalFunds * 0.30
+  let buyAmount = totalFunds * 0.50
   if(totalFunds < 30){
     return false
   }
