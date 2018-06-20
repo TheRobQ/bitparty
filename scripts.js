@@ -151,10 +151,8 @@ const current = async () => {
     if(buy === true && bought != true && enoughFunds != false){
         authedClient.placeOrder(params, setAsBought)
     }
-    if(bought === true && buySellData.boughtPriceETH != 0 && sell === true ){
-        authedClient.sell(sellParams);
-        buySellData.boughtPriceETH = 0;
-        buySellData.bought = false;
+    if(bought === true && sell === true ){
+        authedClient.sell(sellParams, setAsSold);
     }
     console.log(buySellData);
     console.log(params);
