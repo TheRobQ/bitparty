@@ -145,6 +145,12 @@ const current = async () => {
     buySellData.currentPriceETH =  data.ask;
     params.price = data.ask;
     sellParams.price = data.ask;
+    console.log(buySellData);
+    console.log(params);
+    console.log(sellParams);
+    console.log(bought);
+    console.log(buy);
+    console.log(sell);
     // If buy condiutions are met, execute a trade. Only ONE trade should be executed at a time
     if(bought == false){
         if(buy == true ){
@@ -161,12 +167,6 @@ const current = async () => {
           return
         }
     }
-    console.log(buySellData);
-    console.log(params);
-    console.log(sellParams);
-    console.log(bought);
-    console.log(buy);
-    console.log(sell);
   }
 //start
 start()
