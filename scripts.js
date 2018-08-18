@@ -64,25 +64,23 @@ const sellParams = {
   price: 0,
   size: 0,
   product_id: 'ETH-USD',
-  post_only: true,
+  // post_only: true,
 }
 
 //if price at start = 100, buycondition would be $98.50
 const checkBuyCondition  = (buySellData) => {
   if(buySellData.currentPriceETH < buySellData.benchMarkPriceETH * 0.985){
     return true
-  } else {
+  }
     return false
-   }
 }
 
 //If bought at 98.50 sell at 100.47
 const checkSellCondition = (buySellData) =>{
     if(buySellData.currentPriceETH >= buySellData.boughtPriceETH *  1.03){
       return true;
-    }else{
-      return false;
     }
+      return false;
 }
 
 //Ask GDAX for the benchmark price, invoked in intervals below
@@ -147,12 +145,21 @@ const current = async () => {
     buySellData.currentPriceETH =  data.ask;
     params.price = data.ask;
     sellParams.price = data.ask;
-    // If buy condiutionsa re met, execute a trade. Only ONE trade should be executed at a time
-    if(buy === true && bought != true && enoughFunds != false){
-        authedClient.placeOrder(params, setAsBought)
+    // If buy condiutions are met, execute a trade. Only ONE trade should be executed at a time
+    if(bought == false){
+        if(buy == true ){
+          if(enoughFunds != false){
+            authedClient.placeOrder(params, setAsBought)
+          }
+        }
+        return;
     }
-    if(bought === true && sell === true ){
-        authedClient.sell(sellParams, setAsSold);
+    else if(bought == true){
+        if(sell == true ){
+          authedClient.sell(sellParams, setAsSold);
+        } else {
+          return
+        }
     }
     console.log(buySellData);
     console.log(params);
