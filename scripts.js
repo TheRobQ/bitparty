@@ -102,11 +102,11 @@ const getBenchmark = async () => {
   }
   else if(buyAmount > 30){
     let largerSize =  buyAmount / buySellData.currentPriceETH
-    params.size = largerSize.toFixed(4)
+    buyParams.size = largerSize.toFixed(4)
   }
   else{
    let size = 30 / buySellData.currentPriceETH;
-   params.size = size.toFixed(4)
+   buyParams.size = size.toFixed(4)
   }
 }
 
@@ -147,7 +147,7 @@ const current = async () => {
     let enoughFunds = await calculateBuyAmount();
     calculateSellAmount();
     buySellData.currentPriceETH =  data.ask;
-    params.price = data.ask;
+    buyParams.price = data.ask;
     sellParams.price = data.ask;
     console.log(buySellData);
     console.log(buyParams);
