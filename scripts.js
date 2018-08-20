@@ -48,7 +48,7 @@ const getAvailableBTC = async () => {
 
 //Parameters to pass into the buy method
 //Needs to have product ID be a variable
-const params = {
+const buyParams = {
   side: 'buy',
   type: 'limit',
   time_in_force: 'GTT',
@@ -61,6 +61,10 @@ const params = {
 //Params to pass into sell method
 //Needs to have product ID be a variable
 const sellParams = {
+  side: 'sell',
+  type: 'limit',
+  time_in_force: 'GTT',
+  cancel_after: 'day',
   price: 0,
   size: 0,
   product_id: 'ETH-USD',
@@ -146,7 +150,7 @@ const current = async () => {
     params.price = data.ask;
     sellParams.price = data.ask;
     console.log(buySellData);
-    console.log(params);
+    console.log(buyParams);
     console.log(sellParams);
     console.log(bought);
     console.log(buy);
@@ -155,7 +159,7 @@ const current = async () => {
     if(bought == false){
         if(buy == true ){
           if(enoughFunds != false){
-            authedClient.placeOrder(params, setAsBought)
+            authedClient.buy(buyParams, setAsBought)
           }
         }else{
         return;
