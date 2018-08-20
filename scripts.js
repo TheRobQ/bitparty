@@ -89,7 +89,7 @@ const getBenchmark = async () => {
   buySellData.benchMarkPriceETH =  data.ask
 }
 
-//Sets the amount to buy as a percentage of available funds or $20
+//Sets the amount to buy as a percentage of available, right now 50% of what's available funds,  or it will buy $20
  const  calculateBuyAmount = async () =>{
   let totalFunds = await getAvailableBalance()
   let buyAmount = totalFunds * 0.50
@@ -157,8 +157,9 @@ const current = async () => {
           if(enoughFunds != false){
             authedClient.placeOrder(params, setAsBought)
           }
-        }
+        }else{
         return;
+      }
     }
     else if(bought == true){
         if(sell == true ){
@@ -173,7 +174,7 @@ start()
 //find a new benchmark every 4 hours
 setInterval(getBenchmark, 14400000);
 //check the price every minute
-setInterval(current, 15000);
+setInterval(current, 30000);
 
 module.exports = {
   getAvailableBalance,
