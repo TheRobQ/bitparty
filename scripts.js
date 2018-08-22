@@ -71,7 +71,7 @@ const sellParams = {
 
 //if price at start = 100, buycondition would be $98.50
 const checkBuyCondition  = (buySellData) => {
-  if(buySellData.currentPriceETH < buySellData.benchMarkPriceETH * 0.99){
+  if(buySellData.currentPriceETH < buySellData.benchMarkPriceETH * 0.999){
     return true
   }
     return false
@@ -111,7 +111,7 @@ const getBenchmark = async () => {
 //Sets the amount to sell
 const calculateSellAmount = async() =>{
     let coin = await getAvailableETH();
-    console.log(coin);
+    // console.log(coin);
     sellParams.size = coin
   }
 
@@ -120,6 +120,7 @@ const setAsBought = (error, resoponse, data) => {
     console.log(error.body);
   }
   else{
+    // console.log(response);
     console.log(data.price)
     buySellData.boughtPriceETH = data.price;
     bought = true
@@ -132,7 +133,7 @@ const setAsSold = (error, response, data) => {
   }
   else{
     console.log(data.price);
-    console.log(response.id);
+    console.log(response.body);
     buySellData.boughtPriceETH = 0;
     bought = false;
   }
