@@ -71,7 +71,7 @@ const sellParams = {
 
 //if price at start = 100, buycondition would be $98.50
 const checkBuyCondition  = (buySellData) => {
-  if(buySellData.currentPriceETH < buySellData.benchMarkPriceETH * 0.999){
+  if(buySellData.currentPriceETH < buySellData.benchMarkPriceETH * 0.985){
     return true
   }
     return false
@@ -79,7 +79,7 @@ const checkBuyCondition  = (buySellData) => {
 
 //If bought at 98.50 sell at 100.47
 const checkSellCondition = (buySellData) =>{
-    if(buySellData.currentPriceETH >= buySellData.boughtPriceETH *  1.00){
+    if(buySellData.currentPriceETH >= buySellData.boughtPriceETH *  1.03){
       return true;
     }
       return false;
