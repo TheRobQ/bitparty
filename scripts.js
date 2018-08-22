@@ -63,17 +63,15 @@ const buyParams = {
 const sellParams = {
   side: 'sell',
   type: 'limit',
-  time_in_force: 'GTT',
-  cancel_after: 'day',
+  time_in_force: 'GTC',
   price: 0,
   size: 0,
   product_id: 'ETH-USD',
-  // post_only: true,
 }
 
 //if price at start = 100, buycondition would be $98.50
 const checkBuyCondition  = (buySellData) => {
-  if(buySellData.currentPriceETH < buySellData.benchMarkPriceETH * 0.985){
+  if(buySellData.currentPriceETH < buySellData.benchMarkPriceETH * 0.99){
     return true
   }
     return false
@@ -81,7 +79,7 @@ const checkBuyCondition  = (buySellData) => {
 
 //If bought at 98.50 sell at 100.47
 const checkSellCondition = (buySellData) =>{
-    if(buySellData.currentPriceETH >= buySellData.boughtPriceETH *  1.03){
+    if(buySellData.currentPriceETH >= buySellData.boughtPriceETH *  1.00){
       return true;
     }
       return false;
@@ -95,26 +93,27 @@ const getBenchmark = async () => {
 
 //Sets the amount to buy as a percentage of available, right now 50% of what's available funds,  or it will buy $20
  const  calculateBuyAmount = async () =>{
-  let totalFunds = await getAvailableBalance()
-  let buyAmount = totalFunds * 0.50
-  if(totalFunds < 30){
-    return false
-  }
-  else if(buyAmount > 30){
-    let largerSize =  buyAmount / buySellData.currentPriceETH
-    buyParams.size = largerSize.toFixed(4)
-  }
-  else{
-   let size = 30 / buySellData.currentPriceETH;
-   buyParams.size = size.toFixed(4)
-  }
+    let totalFunds = await getAvailableBalance()
+    let buyAmount = totalFunds * 0.50
+    if(totalFunds < 30){
+      return false
+    }
+    else if(buyAmount > 30){
+      let largerSize =  buyAmount / buySellData.currentPriceETH
+      buyParams.size = largerSize.toFixed(4)
+    }
+    else{
+     let size = 30 / buySellData.currentPriceETH;
+     buyParams.size = size.toFixed(4)
+    }
 }
 
 //Sets the amount to sell
 const calculateSellAmount = async() =>{
-  let coin = await getAvailableETH();
-  sellParams.size = coin
-}
+    let coin = await getAvailableETH();
+    console.log(coin);
+    sellParams.size = coin
+  }
 
 const setAsBought = (error, resoponse, data) => {
   if(error){
@@ -127,12 +126,13 @@ const setAsBought = (error, resoponse, data) => {
   }
 }
 
-const setAsSold = (error, resoponse, data) => {
+const setAsSold = (error, response, data) => {
   if(error){
     console.log(error.body);
   }
   else{
-    console.log(data.price)
+    console.log(data.price);
+    console.log(response.id);
     buySellData.boughtPriceETH = 0;
     bought = false;
   }
