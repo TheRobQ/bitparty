@@ -16,9 +16,9 @@ const authedClient = new Gdax.AuthenticatedClient(
 const buySellData = {
   benchMarkPriceETH: 0,
   currentPriceETH: 0,
-  boughtPriceETH: 0,
+  boughtPriceETH: 272.69,
 };
-let bought = false;
+let bought = true;
 
 //kick it off
 const start = async () => {
