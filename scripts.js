@@ -16,9 +16,31 @@ const authedClient = new Gdax.AuthenticatedClient(
 const buySellData = {
   benchMarkPriceETH: 0,
   currentPriceETH: 0,
-  boughtPriceETH: 0,
+  boughtPriceETH: '290.50',
 };
-let bought = false;
+let bought = true;
+//Parameters to pass into the buy method
+//Needs to have product ID be a variable
+const buyParams = {
+  side: 'buy',
+  type: 'limit',
+  time_in_force: 'GTT',
+  cancel_after: 'day',
+  price: 0,
+  size: 0,
+  product_id: 'ETH-USD',
+};
+
+//Params to pass into sell method
+//Needs to have product ID be a variable
+const sellParams = {
+  side: 'sell',
+  type: 'limit',
+  time_in_force: 'GTC',
+  price: 0,
+  size: 0,
+  product_id: 'ETH-USD',
+};
 
 //kick it off
 const start = async () => {
@@ -44,29 +66,6 @@ const getAvailableETH = async () => {
 const getAvailableBTC = async () => {
     let btc = await authedClient.getAccount();
     return btc[2].balance
-}
-
-//Parameters to pass into the buy method
-//Needs to have product ID be a variable
-const buyParams = {
-  side: 'buy',
-  type: 'limit',
-  time_in_force: 'GTT',
-  cancel_after: 'day',
-  price: 0,
-  size: 0,
-  product_id: 'ETH-USD',
-};
-
-//Params to pass into sell method
-//Needs to have product ID be a variable
-const sellParams = {
-  side: 'sell',
-  type: 'limit',
-  time_in_force: 'GTC',
-  price: 0,
-  size: 0,
-  product_id: 'ETH-USD',
 }
 
 //if price at start = 100, buycondition would be $98.50
@@ -115,13 +114,11 @@ const calculateSellAmount = async() =>{
     sellParams.size = coin
   }
 
-const setAsBought = (error, resoponse, data) => {
+const setAsBought = (error, response, data) => {
   if(error){
     console.log(error.body);
   }
   else{
-    // console.log(response);
-    // console.log(data.price)
     buySellData.boughtPriceETH = data.price;
     bought = true
   }
