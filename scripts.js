@@ -16,9 +16,9 @@ const authedClient = new Gdax.AuthenticatedClient(
 const buySellData = {
   benchMarkPriceETH: 0,
   currentPriceETH: 0,
-  boughtPriceETH: '290.50',
+  boughtPriceETH: 0,
 };
-let bought = true;
+let bought = false;
 //Parameters to pass into the buy method
 //Needs to have product ID be a variable
 const buyParams = {
@@ -70,7 +70,7 @@ const getAvailableBTC = async () => {
 
 //if price at start = 100, buycondition would be $98.50
 const checkBuyCondition  = (buySellData) => {
-  if(buySellData.currentPriceETH < buySellData.benchMarkPriceETH * 0.985){
+  if(buySellData.currentPriceETH <= buySellData.benchMarkPriceETH){
     return true
   }
     return false
@@ -78,7 +78,7 @@ const checkBuyCondition  = (buySellData) => {
 
 //If bought at 98.50 sell at 100.47
 const checkSellCondition = (buySellData) =>{
-    if(buySellData.currentPriceETH >= buySellData.boughtPriceETH *  1.03){
+    if(buySellData.currentPriceETH >= buySellData.boughtPriceETH *  1.01){
       return true;
     }
       return false;
@@ -107,18 +107,12 @@ const getBenchmark = async () => {
     }
 }
 
-//Sets the amount to sell
-const calculateSellAmount = async() =>{
-    let coin = await getAvailableETH();
-    // console.log(coin);
-    sellParams.size = coin
-  }
-
 const setAsBought = (error, response, data) => {
   if(error){
-    console.log(error.body);
+    console.log(error);
   }
   else{
+    console.log(response);
     buySellData.boughtPriceETH = data.price;
     bought = true
   }
@@ -126,11 +120,11 @@ const setAsBought = (error, response, data) => {
 
 const setAsSold = (error, response, data) => {
   if(error){
-    console.log(error.body);
+    console.log(response);
   }
   else{
-    console.log(data.price);
-    console.log(response.body);
+    // console.log(data);
+    console.log(response);
     buySellData.boughtPriceETH = 0;
     bought = false;
   }
@@ -143,10 +137,11 @@ const current = async () => {
     let buy = checkBuyCondition(buySellData);
     let sell = checkSellCondition(buySellData);
     let enoughFunds = await calculateBuyAmount();
-    calculateSellAmount();
+    let sellme = await getAvailableETH();
     buySellData.currentPriceETH =  data.ask;
     buyParams.price = data.ask;
     sellParams.price = data.ask;
+    sellParams.size = sellme;
     console.log(buySellData);
     console.log(buyParams);
     console.log(sellParams);
@@ -156,7 +151,8 @@ const current = async () => {
     // If buy condiutions are met, execute a trade. Only ONE trade should be executed at a time
     if(bought == false){
         if(buy == true ){
-          if(enoughFunds != false){
+          if(enoughFunds == true){
+            console.log('buy');
             authedClient.buy(buyParams, setAsBought)
           }
         }else{
@@ -176,7 +172,7 @@ start()
 //find a new benchmark every 4 hours
 setInterval(getBenchmark, 14400000);
 //check the price every minute
-setInterval(current, 30000);
+setInterval(current, 3000);
 
 module.exports = {
   getAvailableBalance,
