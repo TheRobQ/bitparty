@@ -11,9 +11,9 @@ const authedClient = new Gdax.AuthenticatedClient(key, secret, passphrase, apiUR
 const buySellData = {
   benchMarkPriceETH: 0,
   currentPriceETH: 0,
-  boughtPriceETH: 200.00
+  boughtPriceETH: 0,
 };
-let bought = true;
+let bought = false;
 //Parameters to pass into the buy method
 //Needs to have product ID be a variable
 const buyParams = {
@@ -63,7 +63,7 @@ const getAvailableBalance = async () => {
 const getAvailableETH = async () => {
   try {
     let ether = await authedClient.getAccount();
-  return ether[1].balance
+    return ether[1].balance
   } catch (error) {
   console.log(error)
   }
@@ -81,7 +81,7 @@ const getAvailableBTC = async () => {
 
 //if price at start = 100, buycondition would be $98.50
 const checkBuyCondition = (buySellData) => {
-  if (buySellData.currentPriceETH <= buySellData.benchMarkPriceETH) {
+  if (buySellData.currentPriceETH <= (buySellData.benchMarkPriceETH * 0.985)) {
     return true
   }
   return false
@@ -89,7 +89,7 @@ const checkBuyCondition = (buySellData) => {
 
 //If bought at 98.50 sell at 100.47
 const checkSellCondition = (buySellData) => {
-  if (buySellData.currentPriceETH >= buySellData.boughtPriceETH * 1.01) {
+  if (buySellData.currentPriceETH >= buySellData.boughtPriceETH * 1.025) {
     return true;
   }
   return false;
@@ -140,7 +140,7 @@ const setAsSold = (error, response, data) => {
   } else {
     // console.log(data);
     let json = response.body;
-    let soldData = JSON.parse();
+    let soldData = JSON.parse(json);
     console.log(soldData);
     if(soldData.created_at === "" || !soldData.created_at ){
       return
@@ -178,7 +178,7 @@ const current = async () => {
       return;
     }
   } else {
-    if (sell == true) {
+    if (sell == true && sellParams.size > 0) {
       authedClient.sell(sellParams, setAsSold);
     }
   }
