@@ -189,7 +189,7 @@ start()
 //find a new benchmark every 4 hours
 setInterval(getBenchmark, 14400000);
 //check the price every minute
-setInterval(current, 12000);
+setInterval(current, 30000);
 
 module.exports = {
   getAvailableBalance,
