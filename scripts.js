@@ -12,9 +12,9 @@ const authedClient = new Gdax.AuthenticatedClient(key, secret, passphrase, apiUR
 const buySellData = {
   benchMarkPriceETH: 0,
   currentPriceETH: 0,
-  boughtPriceETH: 195.59,
+  boughtPriceETH: 0,
 };
-let bought = true;
+let bought = false;
 //Parameters to pass into the buy method
 //Needs to have product ID be a variable
 const buyParams = {
