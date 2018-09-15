@@ -12,7 +12,7 @@ const authedClient = new Gdax.AuthenticatedClient(key, secret, passphrase, apiUR
 const buySellData = {
   benchMarkPriceETH: 0,
   currentPriceETH: 0,
-  boughtPriceETH: 0,
+  boughtPriceETH: 204.00,
 };
 let bought = false;
 //Parameters to pass into the buy method
@@ -143,7 +143,7 @@ const setAsSold = (error, response, data) => {
     let json = response.body;
     let soldData = JSON.parse(json);
     console.log(soldData);
-    if(soldData.created_at === "" || !soldData.created_at ){
+    if(soldData.status != 'pending'){
       return
     } else {
       buySellData.boughtPriceETH = 0;
