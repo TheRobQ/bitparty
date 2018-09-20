@@ -2,11 +2,11 @@
 const Gdax = require('gdax');
 const pass = require('./pass.js')
 const publicClient = new Gdax.PublicClient();
-const key =  config.key;
-const secret = config.secret;
-const passphrase =  config.passphrase;
+const key =  pass.key;
+const secret = pass.secret;
+const passphrase =  pass.passphrase;
 const apiURI = 'https://api.gdax.com';
-const accountID = config.accountID;
+const accountID = pass.accountID;
 const authedClient = new Gdax.AuthenticatedClient(key, secret, passphrase, apiURI);
 //holds current BTC value, benchmark value
 const buySellData = {
