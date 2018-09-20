@@ -110,6 +110,7 @@ const getBenchmark = async () => {
 const calculateBuyAmount = async () => {
   try {
     let totalFunds = await getAvailableBalance()
+    console.log(totalFunds);
     let buyAmount = totalFunds * 0.50
     if (totalFunds < 30) {
       return false
@@ -127,7 +128,7 @@ const calculateBuyAmount = async () => {
 
 const setAsBought = (error, response, data) => {
   if (error) {
-    console.log(error);
+    console.log(error.error);
   } else {
     console.log(response.body);
     buySellData.boughtPriceETH = data.price;
