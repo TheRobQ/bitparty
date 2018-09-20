@@ -1,18 +1,18 @@
 'use strict';
 const Gdax = require('gdax');
-// const pass = require('./pass.js')
+const pass = require('./pass.js')
 const publicClient = new Gdax.PublicClient();
-const key =  'ffe43a14b45d9306635a3b6d89fe287c';
-const secret = '50d84qdGDy3WQyW1em+VhdpK9RqSy7q6i4ihmQSqKRY56E1N201VfoI3nMJsNNzjHrPFk4HoxfwbhPiH45r6KA==';
-const passphrase =  'jhi3acc4ox';
+const key =  config.key;
+const secret = config.secret;
+const passphrase =  config.passphrase;
 const apiURI = 'https://api.gdax.com';
-const accountID = '12212be5-f341-4301-9654-b32fbd2e6501';
+const accountID = config.accountID;
 const authedClient = new Gdax.AuthenticatedClient(key, secret, passphrase, apiURI);
 //holds current BTC value, benchmark value
 const buySellData = {
   benchMarkPriceETH: 0,
   currentPriceETH: 0,
-  boughtPriceETH: 204.00,
+  boughtPriceETH: 0,
 };
 let bought = false;
 //Parameters to pass into the buy method
@@ -189,7 +189,7 @@ start()
 //find a new benchmark every 4 hours
 setInterval(getBenchmark, 14400000);
 //check the price every minute
-setInterval(current, 30000);
+setInterval(current, 60000);
 
 module.exports = {
   getAvailableBalance,
